@@ -1,11 +1,13 @@
 import express from "express";
 import checkConnection from "./DB/connectionDB.js";
+import cors from "cors";
+import { port } from "./config/config.service.js";
 
 const app = express();
-const port = 3000;
+const port = port;
 
 const bootstrap = async () => {
-  app.use(express.json());
+  app.use(cors(), express.json());
 
   app.get("/", (req, res) => res.send("Hello World!"));
 
