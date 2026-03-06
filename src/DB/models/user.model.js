@@ -36,6 +36,12 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minlength: 8,
     },
+    cPassword: {
+      type: String,
+      required: function () {
+        return this.provider === ProviderEnum.google ? false : true;
+      },
+    },
     phone: {
       type: String,
       required: true,
@@ -50,7 +56,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       // required: true,
     },
-    profilePicture: String,
+    profilePicture: {
+      secure_url: { type: String },
+      public_id: { type: String },
+    },
+    coverPictures: [
+      {
+        secure_url: { type: String },
+        public_id: { type: String },
+      },
+    ],
     confirmed: Boolean,
     provider: {
       type: String,

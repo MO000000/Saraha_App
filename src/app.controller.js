@@ -22,7 +22,7 @@ const bootstrap = async () => {
   app.use((err, req, res, next) => {
     res
       .status(err.cause || 500)
-      .json({ message: err.message, stack: err.stack });
+      .json({ message: err.message, stack: err.stack, error: err });
   });
 
   app.listen(port, () => console.log(`Example app listening on port ${port}!`));

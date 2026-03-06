@@ -14,10 +14,11 @@ import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { OAuth2Client } from "google-auth-library";
 import { SALT_ROUNDS, SECRET_KEY } from "../../config/index.js";
+import cloudinary from "../../common/utils/cloudinary.js";
 
 export const SignUp = async (req, res, next) => {
   try {
-    const { userName, email, password, age, gender } = req.body;
+    const { userName, email, password, cPassword, age, gender } = req.body;
     const { phone } = req.body;
     const EmailExists = await db_service.findOne({
       model: UserModel,
@@ -25,6 +26,15 @@ export const SignUp = async (req, res, next) => {
     });
     if (EmailExists) throw new Error("Email already exists");
 
+    if (password !== cPassword)
+      throw new Error("Password does not match", { cause: 400 });
+
+    const { secure_url, public_id } = await cloudinary.uploader.upload(
+      req.file.path,
+    );
+
+    let arr_paths = [];
+    for (const file of req.files) arr_paths.push(file.path);
     const user = await db_service.create({
       model: UserModel,
       data: {
@@ -37,6 +47,11 @@ export const SignUp = async (req, res, next) => {
         age,
         gender,
         phone: encrypt(phone),
+        profilePicture: {
+          secure_url,
+          public_id,
+        },
+        coverpictures: arr_paths,
       },
     });
     res.status(201).json({ message: "User created successfully", data: user });
